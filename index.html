@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乐购商城 - 后台管理系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        .sidebar-active {
+            background-color: #e0e7ff;
+            border-left: 4px solid #4f46e5;
+        }
+        .modal {
+            display: none;
+        }
+        .modal.show {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-indigo-600 text-white shadow-lg fixed w-full z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-xl font-bold">🛍️ 乐购商城后台管理</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span id="adminUsername">管理员</span>
+                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">
+                    退出登录
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex pt-16">
+        <!-- 侧边栏 -->
+        <aside class="w-64 bg-white h-screen fixed shadow-lg overflow-y-auto">
+            <ul class="py-4">
+                <li>
+                    <a href="#" onclick="showSection('dashboard')" class="sidebar-link sidebar-active block px-6 py-3 hover:bg-gray-50 transition">
+                        <i class="fa fa-dashboard mr-2"></i> 仪表盘
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('products')" class="sidebar-link block px-6 py-3 hover:bg-gray-50 transition">
+                        <i class="fa fa-shopping-bag mr-2"></i> 商品管理
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('orders')" class="sidebar-link block px-6 py-3 hover:bg-gray-50 transition">
+                        <i class="fa fa-list-alt mr-2"></i> 订单管理
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('users')" class="sidebar-link block px-6 py-3 hover:bg-gray-50 transition">
+                        <i class="fa fa-users mr-2"></i> 用户管理
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('categories')" class="sidebar-link block px-6 py-3 hover:bg-gray-50 transition">
+                        <i class="fa fa-tags mr-2"></i> 分类管理
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('banners')" class="sidebar-link block px-6 py-3 hover:bg-gray-50 transition">
+                        <i class="fa fa-image mr-2"></i> 轮播图管理
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="ml-64 flex-1 p-8">
+            <!-- 仪表盘 -->
+            <div id="dashboard-section" class="section">
+                <h2 class="text-2xl font-bold mb-6">数据概览</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">用户总数</p>
+                                <p class="text-3xl font-bold text-indigo-600" id="stat-users">0</p>
+                            </div>
+                            <i class="fa fa-users text-4xl text-indigo-200"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">商品总数</p>
+                                <p class="text-3xl font-bold text-green-600" id="stat-products">0</p>
+                            </div>
+                            <i class="fa fa-shopping-bag text-4xl text-green-200"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">订单总数</p>
+                                <p class="text-3xl font-bold text-blue-600" id="stat-orders">0</p>
+                            </div>
+                            <i class="fa fa-shopping-cart text-4xl text-blue-200"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">今日订单</p>
+                                <p class="text-3xl font-bold text-yellow-600" id="stat-today-orders">0</p>
+                            </div>
+                            <i class="fa fa-calendar text-4xl text-yellow-200"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">总销售额</p>
+                                <p class="text-3xl font-bold text-red-600">¥<span id="stat-sales">0</span></p>
+                            </div>
+                            <i class="fa fa-money text-4xl text-red-200"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">待处理订单</p>
+                                <p class="text-3xl font-bold text-purple-600" id="stat-pending-orders">0</p>
+                            </div>
+                            <i class="fa fa-clock-o text-4xl text-purple-200"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 商品管理 -->
+            <div id="products-section" class="section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">商品管理</h2>
+                    <button onclick="showAddProductModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
+                        <i class="fa fa-plus mr-2"></i>添加商品
+                    </button>
+                </div>
+                <div class="bg-white rounded-lg shadow overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">商品编号</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">商品名称</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">价格</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">库存</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">销量</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-tbody" class="divide-y divide-gray-200">
+                            <!-- 动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="products-pagination" class="mt-4 flex justify-center"></div>
+            </div>
+
+            <!-- 订单管理 -->
+            <div id="orders-section" class="section hidden">
+                <h2 class="text-2xl font-bold mb-6">订单管理</h2>
+                <div class="bg-white rounded-lg shadow overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">订单号</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">用户</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">金额</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody" class="divide-y divide-gray-200">
+                            <!-- 动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="orders-pagination" class="mt-4 flex justify-center"></div>
+            </div>
+
+            <!-- 用户管理 -->
+            <div id="users-section" class="section hidden">
+                <h2 class="text-2xl font-bold mb-6">用户管理</h2>
+                <div class="bg-white rounded-lg shadow overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">用户名</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">邮箱</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">手机号</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">角色</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-tbody" class="divide-y divide-gray-200">
+                            <!-- 动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="users-pagination" class="mt-4 flex justify-center"></div>
+            </div>
+
+            <!-- 分类管理 -->
+            <div id="categories-section" class="section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">分类管理</h2>
+                    <button onclick="showAddCategoryModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
+                        <i class="fa fa-plus mr-2"></i>添加分类
+                    </button>
+                </div>
+                <div class="bg-white rounded-lg shadow">
+                    <div id="categories-list" class="p-6">
+                        <!-- 动态加载 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 轮播图管理 -->
+            <div id="banners-section" class="section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">轮播图管理</h2>
+                    <button onclick="showAddBannerModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
+                        <i class="fa fa-plus mr-2"></i>添加轮播图
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="banners-grid">
+                    <!-- 动态加载 -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 添加商品模态框 -->
+    <div id="product-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold mb-4">添加商品</h3>
+            <form id="product-form" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">商品编号*</label>
+                        <input type="text" name="product_id" required class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">商品名称*</label>
+                        <input type="text" name="name" required class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">价格*</label>
+                        <input type="number" step="0.01" name="price" required class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">原价</label>
+                        <input type="number" step="0.01" name="original_price" class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">库存</label>
+                        <input type="number" name="stock" value="0" class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">分类</label>
+                        <select name="category_id" class="w-full border rounded px-3 py-2" id="product-category-select">
+                            <option value="">请选择</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">商品描述</label>
+                    <textarea name="description" rows="3" class="w-full border rounded px-3 py-2"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">商品图片URL</label>
+                    <input type="text" name="image" class="w-full border rounded px-3 py-2" placeholder="https://...">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="closeProductModal()" class="px-4 py-2 border rounded hover:bg-gray-50">取消</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        let authToken = localStorage.getItem('admin_token');
+
+        // API请求封装
+        async function apiRequest(url, options = {}) {
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+                }
+            };
+
+            const response = await fetch(`${API_BASE}${url}`, {
+                ...defaultOptions,
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...options.headers
+                }
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                if (response.status === 401) {
+                    alert('登录已过期，请重新登录');
+                    logout();
+                }
+                throw new Error(data.message || '请求失败');
+            }
+
+            return data;
+        }
+
+        // 显示章节
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`${section}-section`).classList.remove('hidden');
+            
+            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('sidebar-active'));
+            event.target.closest('a').classList.add('sidebar-active');
+
+            // 加载对应数据
+            switch(section) {
+                case 'dashboard':
+                    loadDashboardStats();
+                    break;
+                case 'products':
+                    loadProducts();
+                    break;
+                case 'orders':
+                    loadOrders();
+                    break;
+                case 'users':
+                    loadUsers();
+                    break;
+                case 'categories':
+                    loadCategories();
+                    break;
+                case 'banners':
+                    loadBanners();
+                    break;
+            }
+        }
+
+        // 加载仪表盘统计
+        async function loadDashboardStats() {
+            try {
+                const { data } = await apiRequest('/admin/dashboard/stats');
+                document.getElementById('stat-users').textContent = data.userCount;
+                document.getElementById('stat-products').textContent = data.productCount;
+                document.getElementById('stat-orders').textContent = data.orderCount;
+                document.getElementById('stat-today-orders').textContent = data.todayOrderCount;
+                document.getElementById('stat-sales').textContent = data.totalSales;
+                document.getElementById('stat-pending-orders').textContent = data.pendingOrderCount;
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+            }
+        }
+
+        // 加载商品列表
+        async function loadProducts(page = 1) {
+            try {
+                const { data } = await apiRequest(`/products?page=${page}&limit=10`);
+                const tbody = document.getElementById('products-tbody');
+                tbody.innerHTML = '';
+
+                data.products.forEach(product => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-6 py-4">${product.product_id}</td>
+                        <td class="px-6 py-4">${product.name}</td>
+                        <td class="px-6 py-4">¥${product.price}</td>
+                        <td class="px-6 py-4">${product.stock}</td>
+                        <td class="px-6 py-4">${product.sales}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded ${product.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${product.status === 'active' ? '上架' : '下架'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <button onclick="deleteProduct(${product.id})" class="text-red-600 hover:text-red-800">删除</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('加载商品失败:', error);
+            }
+        }
+
+        // 加载订单列表
+        async function loadOrders(page = 1) {
+            try {
+                const { data } = await apiRequest(`/admin/orders?page=${page}&limit=10`);
+                const tbody = document.getElementById('orders-tbody');
+                tbody.innerHTML = '';
+
+                const statusMap = {
+                    'pending': { text: '待支付', class: 'bg-yellow-100 text-yellow-800' },
+                    'paid': { text: '已支付', class: 'bg-blue-100 text-blue-800' },
+                    'shipped': { text: '已发货', class: 'bg-purple-100 text-purple-800' },
+                    'completed': { text: '已完成', class: 'bg-green-100 text-green-800' },
+                    'cancelled': { text: '已取消', class: 'bg-red-100 text-red-800' }
+                };
+
+                data.orders.forEach(order => {
+                    const status = statusMap[order.status] || { text: order.status, class: '' };
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-6 py-4">${order.order_no}</td>
+                        <td class="px-6 py-4">${order.username}</td>
+                        <td class="px-6 py-4">¥${order.total_amount}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded ${status.class}">${status.text}</span>
+                        </td>
+                        <td class="px-6 py-4">${new Date(order.created_at).toLocaleString('zh-CN')}</td>
+                        <td class="px-6 py-4">
+                            <select onchange="updateOrderStatus(${order.id}, this.value)" class="border rounded px-2 py-1 text-sm">
+                                <option value="">更新状态</option>
+                                <option value="paid">标记已支付</option>
+                                <option value="shipped">标记已发货</option>
+                                <option value="completed">标记已完成</option>
+                                <option value="cancelled">取消订单</option>
+                            </select>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('加载订单失败:', error);
+            }
+        }
+
+        // 加载用户列表
+        async function loadUsers(page = 1) {
+            try {
+                const { data } = await apiRequest(`/admin/users?page=${page}&limit=10`);
+                const tbody = document.getElementById('users-tbody');
+                tbody.innerHTML = '';
+
+                data.users.forEach(user => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-6 py-4">${user.id}</td>
+                        <td class="px-6 py-4">${user.username}</td>
+                        <td class="px-6 py-4">${user.email || '-'}</td>
+                        <td class="px-6 py-4">${user.phone || '-'}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}">
+                                ${user.role === 'admin' ? '管理员' : '用户'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded ${user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${user.status === 'active' ? '正常' : '禁用'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <button onclick="toggleUserStatus(${user.id}, '${user.status}')" class="text-indigo-600 hover:text-indigo-800">
+                                ${user.status === 'active' ? '禁用' : '启用'}
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('加载用户失败:', error);
+            }
+        }
+
+        // 加载分类列表
+        async function loadCategories() {
+            try {
+                const { data } = await apiRequest('/categories');
+                const list = document.getElementById('categories-list');
+                list.innerHTML = '';
+
+                data.forEach(category => {
+                    const div = document.createElement('div');
+                    div.className = 'border-b py-3 flex justify-between items-center';
+                    div.innerHTML = `
+                        <div>
+                            <h4 class="font-medium">${category.name}</h4>
+                            <p class="text-sm text-gray-600">${category.description || ''}</p>
+                        </div>
+                        <button onclick="deleteCategory(${category.id})" class="text-red-600 hover:text-red-800">删除</button>
+                    `;
+                    list.appendChild(div);
+                });
+
+                // 同时更新商品表单中的分类选择
+                const select = document.getElementById('product-category-select');
+                select.innerHTML = '<option value="">请选择</option>';
+                data.forEach(cat => {
+                    select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+                });
+            } catch (error) {
+                console.error('加载分类失败:', error);
+            }
+        }
+
+        // 加载轮播图列表
+        async function loadBanners() {
+            try {
+                const { data } = await apiRequest('/admin/banners');
+                const grid = document.getElementById('banners-grid');
+                grid.innerHTML = '';
+
+                data.forEach(banner => {
+                    const div = document.createElement('div');
+                    div.className = 'bg-white rounded-lg shadow overflow-hidden';
+                    div.innerHTML = `
+                        <img src="${banner.image}" alt="${banner.title}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <h4 class="font-medium mb-2">${banner.title || '无标题'}</h4>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">排序: ${banner.sort_order}</span>
+                                <button onclick="deleteBanner(${banner.id})" class="text-red-600 hover:text-red-800 text-sm">删除</button>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(div);
+                });
+            } catch (error) {
+                console.error('加载轮播图失败:', error);
+            }
+        }
+
+        // 模态框操作
+        function showAddProductModal() {
+            document.getElementById('product-modal').classList.add('show');
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.remove('show');
+            document.getElementById('product-form').reset();
+        }
+
+        // 添加商品
+        document.getElementById('product-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                await apiRequest('/admin/products/add', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                alert('商品添加成功');
+                closeProductModal();
+                loadProducts();
+            } catch (error) {
+                alert('添加失败: ' + error.message);
+            }
+        });
+
+        // 删除商品
+        async function deleteProduct(id) {
+            if (!confirm('确定要删除这个商品吗？')) return;
+            
+            try {
+                await apiRequest(`/admin/products/delete/${id}`, { method: 'DELETE' });
+                alert('删除成功');
+                loadProducts();
+            } catch (error) {
+                alert('删除失败: ' + error.message);
+            }
+        }
+
+        // 更新订单状态
+        async function updateOrderStatus(id, status) {
+            if (!status) return;
+            
+            try {
+                await apiRequest(`/admin/orders/status/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ status })
+                });
+                alert('订单状态已更新');
+                loadOrders();
+            } catch (error) {
+                alert('更新失败: ' + error.message);
+            }
+        }
+
+        // 切换用户状态
+        async function toggleUserStatus(id, currentStatus) {
+            const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+            
+            try {
+                await apiRequest(`/admin/users/status/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ status: newStatus })
+                });
+                alert('用户状态已更新');
+                loadUsers();
+            } catch (error) {
+                alert('更新失败: ' + error.message);
+            }
+        }
+
+        // 简化的添加功能
+        function showAddCategoryModal() {
+            const name = prompt('请输入分类名称:');
+            if (!name) return;
+            
+            const description = prompt('请输入分类描述（可选）:');
+            
+            apiRequest('/admin/categories/add', {
+                method: 'POST',
+                body: JSON.stringify({ name, description })
+            }).then(() => {
+                alert('添加成功');
+                loadCategories();
+            }).catch(err => alert('添加失败: ' + err.message));
+        }
+
+        function showAddBannerModal() {
+            const image = prompt('请输入轮播图URL:');
+            if (!image) return;
+            
+            const title = prompt('请输入标题（可选）:');
+            
+            apiRequest('/admin/banners/add', {
+                method: 'POST',
+                body: JSON.stringify({ image, title })
+            }).then(() => {
+                alert('添加成功');
+                loadBanners();
+            }).catch(err => alert('添加失败: ' + err.message));
+        }
+
+        async function deleteCategory(id) {
+            if (!confirm('确定要删除这个分类吗？')) return;
+            
+            try {
+                await apiRequest(`/admin/categories/delete/${id}`, { method: 'DELETE' });
+                alert('删除成功');
+                loadCategories();
+            } catch (error) {
+                alert('删除失败: ' + error.message);
+            }
+        }
+
+        async function deleteBanner(id) {
+            if (!confirm('确定要删除这个轮播图吗？')) return;
+            
+            try {
+                await apiRequest(`/admin/banners/delete/${id}`, { method: 'DELETE' });
+                alert('删除成功');
+                loadBanners();
+            } catch (error) {
+                alert('删除失败: ' + error.message);
+            }
+        }
+
+        // 登出
+        function logout() {
+            localStorage.removeItem('admin_token');
+            window.location.href = 'admin-login.html';
+        }
+
+        // 初始化
+        if (!authToken) {
+            window.location.href = 'admin-login.html';
+        } else {
+            loadDashboardStats();
+            loadCategories(); // 预加载分类用于商品表单
+        }
+    </script>
+</body>
+</html>
+
